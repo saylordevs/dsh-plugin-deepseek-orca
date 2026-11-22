@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "title": { "en": "DeepSeek orca", "ru": "Кит DeepSeek" },
+  "description": {
+    "en": "A draggable companion that follows your sessions and surfaces approvals from other sessions.",
+    "ru": "Перетаскиваемый компаньон, который следит за вашими сессиями и показывает запросы подтверждения из других сессий."
+  },
+  "metadata": {
+    "categories": {
+      "interface": { "title": { "en": "Interface", "ru": "Интерфейс" } }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-plugin-deepseek-orca",
+      "title": { "en": "DeepSeek orca companion", "ru": "Компаньон-кит DeepSeek" },
+      "description": {
+        "en": "Adds a small draggable companion to the DSH window that follows your work: it cruises while you think, taps at a laptop while a turn runs, raises a fin when the agent waits for you, celebrates completed turns and naps when idle. When another session asks for approval, a compact card appears beside it with the action, the session name and Allow once / Reject. Looks, size, animations, an optional completion sound and nap delay are configurable, and the position is stored relative to the window. It reads only session status, turn boundaries and pending approval details, never message text.",
+        "ru": "Добавляет в окно DSH небольшого перетаскиваемого компаньона, который следует за вашей работой: бороздит простор, пока вы думаете, стучит по ноутбуку, пока идёт ход, поднимает плавник, когда агент ждёт вас, радуется завершённым ходам и дремлет в простое. Если другая сессия просит подтверждения, рядом появляется компактная карточка с действием, именем сессии и кнопками «Разрешить один раз» / «Отклонить». Настраиваются вид, размер, анимации, звук завершения и задержка сна; позиция хранится относительно окна. Плагин читает только статус сессии, границы ходов и данные запроса подтверждения — никогда текст сообщений."
+      },
+      "icon": "icons/deepseek-orca.svg",
+      "author": "saylordevs",
+      "homepage": "https://github.com/saylordevs/dsh-plugin-deepseek-orca#readme",
+      "repository": {
+        "url": "https://github.com/saylordevs/dsh-plugin-deepseek-orca"
+      },
+      "metadata": { "category": "interface" },
+      "versions": [
+        {
+          "version": "1.2.0",
+          "publishTimestamp": 1795353928,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/saylordevs/dsh-plugin-deepseek-orca",
+            "commit": "74c79c7670004803b336d511e8706e9ef2277a5d"
+          },
+          "engines": { "dsh": ">=0.2.2-rc.4 <0.3.0" }
+        }
+      ]
+    }
+  ]
+}
