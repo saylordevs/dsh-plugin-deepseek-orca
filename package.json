@@ -1,0 +1,60 @@
+{
+  "name": "dsh-plugin-deepseek-orca",
+  "version": "1.2.0",
+  "description": "A tiny draggable companion for the DeepSeek Harness window — orca, dolphin or humpback — that follows your sessions, offers Allow/Reject for approvals from other sessions, and can chime when work finishes or a decision is needed.",
+  "type": "module",
+  "license": "MIT",
+  "author": "saylordevs",
+  "homepage": "https://github.com/saylordevs/dsh-plugin-deepseek-orca#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saylordevs/dsh-plugin-deepseek-orca.git"
+  },
+  "bugs": {
+    "url": "https://github.com/saylordevs/dsh-plugin-deepseek-orca/issues"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "mascot",
+    "companion",
+    "orca",
+    "desktop-pet"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "docs",
+    "icon.svg",
+    "README.md",
+    "README.ru.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node tests/orca.test.mjs",
+    "check": "node .smoke/check.js"
+  },
+  "engines": {
+    "dsh": ">=0.2.2-rc.4 <0.3.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-layout"
+      ]
+    }
+  }
+}

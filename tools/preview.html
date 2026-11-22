@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DeepSeek orca — offline preview</title>
+<style>
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background:
+      radial-gradient(900px 500px at 78% 18%, rgba(77, 107, 254, .22), transparent 62%),
+      radial-gradient(700px 420px at 20% 82%, rgba(143, 169, 224, .12), transparent 60%),
+      #0d1120;
+    color: #dfe6ff;
+  }
+  .mock { position: absolute; inset: 0; display: flex; flex-direction: column; }
+  .mock-top { height: 44px; border-bottom: 1px solid rgba(143, 169, 224, .12); display: flex; align-items: center; padding: 0 16px; gap: 10px; }
+  .mock-body { flex: 1; padding: 28px 32px; max-width: 620px; }
+  h1 { font-size: 20px; font-weight: 600; margin: 0 0 10px; }
+  p { font-size: 13px; line-height: 1.6; color: #9faad0; margin: 0 0 10px; }
+  .mock-composer {
+    position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%);
+    width: min(620px, 60vw); height: 96px; border-radius: 18px;
+    background: rgba(24, 30, 52, .9); border: 1px solid rgba(143, 169, 224, .16);
+  }
+  .preview-bar {
+    position: fixed; left: 16px; bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; max-width: 420px;
+    z-index: 1000;
+  }
+  .preview-bar button {
+    padding: 5px 9px; border-radius: 7px; border: 1px solid rgba(143, 169, 224, .25);
+    background: rgba(17, 22, 42, .9); color: #c8d2ff; font: inherit; font-size: 11px; cursor: pointer;
+  }
+  .preview-bar button:hover { background: rgba(77, 107, 254, .35); }
+</style>
+</head>
+<body>
+<div class="mock">
+  <div class="mock-top"><strong style="font-size:13px">DeepSeek Harness</strong><span style="font-size:12px;color:#7f8ab5">preview</span></div>
+  <div class="mock-body">
+    <h1>Offline preview</h1>
+    <p>This page renders the orca with the plugin's own stylesheet. It does not connect to DSH and makes no model calls.</p>
+    <p>Use the buttons to cycle through the six states, the settings panel and both languages.</p>
+  </div>
+  <div class="mock-composer"></div>
+</div>
+<div class="preview-bar" id="bar"></div>
+<orca-host id="host"></orca-host>
+<script src="../client.js"></script>
+<script>
+(() => {
+  const api = window.__DeepSeekOrca__;
+  const host = document.getElementById('host');
+  const params = new URLSearchParams(location.search);
+  const language = params.get('lang') === 'ru' ? 'ru' : 'en';
+
+  let clock = Date.now();
+  const view = new api.OrcaView(host, { language, now: () => clock });
+  const scopeKey = 'global:all';
+
+  const states = {
+    resting: { available: true, running: false, pending: false, workingCount: 0, scopeKey },
+    working: { available: true, running: true, pending: false, workingCount: 2, scopeKey },
+    approval: { available: true, running: true, pending: true, pendingKind: 'approval', workingCount: 1, scopeKey },
+    question: { available: true, running: true, pending: true, pendingKind: 'question', workingCount: 1, scopeKey },
+    celebrate: { available: true, running: false, pending: false, workingCount: 0, scopeKey },
+    error: { available: true, running: false, pending: false, workingCount: 0, scopeKey },
+    sleeping: { available: true, running: false, pending: false, workingCount: 0, scopeKey },
+    offline: { available: false, running: false, pending: false, workingCount: 0, scopeKey },
+  };
+
+  let noticeSeq = 0;
+  function show(name) {
+    const state = states[name] || states.resting;
+    clock += 1000;
+    if (name === 'sleeping') clock += view.preferences.sleepAfterMs + 5000;
+    const snapshot = { ...state };
+    if (name === 'celebrate') snapshot.notice = { id: 'demo-' + (++noticeSeq), reason: 'completed' };
+    if (name === 'error') snapshot.notice = { id: 'demo-' + (++noticeSeq), reason: 'error' };
+    view.update(snapshot);
+    if (name === 'sleeping') view.mood.idleSince = clock - view.preferences.sleepAfterMs - 1000;
+    view.paint();
+  }
+
+  const bar = document.getElementById('bar');
+  for (const name of Object.keys(states)) {
+    const button = document.createElement('button');
+    button.textContent = name;
+    button.addEventListener('click', () => show(name));
+    bar.append(button);
+  }
+  const panelButton = document.createElement('button');
+  panelButton.textContent = 'settings';
+  panelButton.addEventListener('click', () => (view.panel.hidden ? view.openPanel() : view.closePanel()));
+  bar.append(panelButton);
+
+  const speciesSelect = document.createElement('select');
+  speciesSelect.style.cssText = 'padding:4px 6px;border-radius:7px;background:#11162a;color:#c8d2ff;border:1px solid rgba(143,169,224,.25);font-size:11px';
+  for (const key of Object.keys(api.SPECIES)) {
+    const option = document.createElement('option');
+    option.value = key;
+    option.textContent = key;
+    speciesSelect.append(option);
+  }
+  speciesSelect.value = view.preferences.species;
+  speciesSelect.addEventListener('change', () => {
+    view.preferences.species = speciesSelect.value;
+    view.speciesKey = speciesSelect.value;
+    view.currentArtState = undefined;
+    view.paint();
+  });
+  bar.append(speciesSelect);
+
+  const initial = params.get('state') || 'resting';
+  show('resting');
+  if (initial !== 'resting') show(initial);
+  if (params.get('panel') === '1') view.openPanel();
+  if (params.get('lang') === 'ru') view.setLanguage('ru');
+  if (params.get('species')) {
+    view.preferences.species = params.get('species');
+    view.speciesKey = view.preferences.species;
+    view.currentArtState = undefined;
+  }
+  if (params.get('sound') === '1') {
+    view.preferences.sound = true;
+    view.applyPreferences();
+  }
+  if (params.get('card') === '1') {
+    view.approvals = [{
+      sessionId: 'other',
+      key: 'demo-approval',
+      toolName: 'bash',
+      reason: 'Run the test suite in the workspace',
+      displayReason: {
+        en: 'Run the test suite in the workspace',
+        ru: 'Запустить тесты в рабочей папке',
+      },
+      sessionTitle: 'Research session',
+      answer: () => Promise.resolve(),
+    }];
+  }
+  view.paint();
+  window.__preview = { view, show };
+})();
+</script>
+</body>
+</html>

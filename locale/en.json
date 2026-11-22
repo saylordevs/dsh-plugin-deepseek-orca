@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "DeepSeek orca companion",
+    "description": "Adds a small draggable companion to the DSH window that follows your work: it cruises while you think, taps at a laptop while a turn runs, raises a fin when the agent waits for you, celebrates completed turns, frowns at failures and naps when everything is idle. Approvals and questions get their own pose. When another session asks for approval, a compact card appears next to the companion with the action, the session name and Allow once / Reject buttons, so you can decide without switching conversations. The eyes follow your pointer, the first-run tip explains the right-click menu, and the position is stored relative to the window so it survives resizing. Settings cover session scope, look (orca, dolphin or humpback), size, gentle animations, an optional completion sound with its own volume, and nap delay; the same sound setting also plays a distinct attention signal for approval requests. Click it to say hello, right-click (or press Enter) for settings, drag it anywhere, and use the arrow keys for fine placement. It reads only session status, turn boundaries and pending approval details (tool name and reason), never message text, and it answers an approval only when you press a button.",
+    "detail": "docs/DETAIL.md"
+  }
+}

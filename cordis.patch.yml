@@ -1,0 +1,4 @@
+# Adds only this plugin's row; no shipped component is replaced.
+- insert:
+    - id: deepseek-orca
+      name: 'dsh-plugin-deepseek-orca'
